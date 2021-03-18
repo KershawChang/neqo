@@ -305,7 +305,7 @@ impl Time {
             }
         }
 
-        #[cfg(windows)]
+        #[cfg(all(windows, feature = "high_res_timer"))]
         {
             if let Some(p) = self.active {
                 assert_eq!(0, unsafe { win::timeBeginPeriod(p.as_uint()) });
@@ -315,7 +315,7 @@ impl Time {
 
     #[allow(clippy::unused_self)] // Only on some platforms is it unused.
     fn stop(&self) {
-        #[cfg(windows)]
+        #[cfg(all(windows, feature = "high_res_timer"))]
         {
             if let Some(p) = self.active {
                 assert_eq!(0, unsafe { win::timeEndPeriod(p.as_uint()) });
