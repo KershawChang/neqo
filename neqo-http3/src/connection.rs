@@ -1609,6 +1609,7 @@ impl Http3Connection {
         stream_id: StreamId,
         conn: &mut Connection,
     ) -> Option<Box<dyn SendStream>> {
+        qinfo!("remove_send_stream {}", stream_id);
         let stream = self.send_streams.remove(&stream_id);
         if let Some(ref s) = stream {
             if s.stream_type() == Http3StreamType::ExtendedConnect {

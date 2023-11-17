@@ -350,8 +350,9 @@ impl Error {
     /// On internal errors, in debug mode.
     fn map_error<R>(r: Result<R, impl Into<Self>>, err: Self) -> Result<R, Self> {
         r.map_err(|e| {
-            debug_assert!(!matches!(e.into(), Self::HttpInternal(..)));
-            debug_assert!(!matches!(err, Self::HttpInternal(..)));
+            let error = e.into();
+            debug_assert!(!matches!(error, Self::HttpInternal(..)), "e.into is {:?}", error);
+            debug_assert!(!matches!(err, Self::HttpInternal(..)), "err is {:?}", err);
             err
         })
     }
