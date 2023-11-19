@@ -242,7 +242,9 @@ impl SendStream for SendMessage {
     /// `TransportStreamDoesNotExist` if the transport stream does not exist (this may happen if `process_output`
     /// has not been called when needed, and HTTP3 layer has not picked up the info that the stream has been closed.)
     fn send(&mut self, conn: &mut Connection) -> Res<()> {
-        let sent = Error::map_error(self.stream.send_buffer(conn), Error::HttpInternal(5))?;
+        let res = self.stream.send_buffer(conn);
+        qinfo!("send_buffer res={:?}", res);
+        let sent = Error::map_error(res, Error::HttpInternal(5))?;
         qlog::h3_data_moved_down(conn.qlog_mut(), self.stream_id(), sent);
 
         qtrace!([self], "{} bytes sent", sent);

@@ -401,6 +401,7 @@ impl Http3Connection {
     fn send_non_control_streams(&mut self, conn: &mut Connection) -> Res<()> {
         let to_send = mem::take(&mut self.streams_with_pending_data);
         for stream_id in to_send {
+            qinfo!("to send: {:?}", stream_id);
             let done = if let Some(s) = &mut self.send_streams.get_mut(&stream_id) {
                 s.send(conn)?;
                 if s.has_data_to_send() {

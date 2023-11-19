@@ -60,8 +60,8 @@ impl BufferedStream {
     pub fn send_buffer(&mut self, conn: &mut Connection) -> Res<usize> {
         let label = ::neqo_common::log_subject!(::log::Level::Debug, self);
         let mut sent = 0;
+        qinfo!("send_buffer stream={:?}", self);
         if let Self::Initialized { stream_id, buf } = self {
-            qinfo!("send_buffer id={}", stream_id);
             if !buf.is_empty() {
                 qtrace!([label], "sending data.");
                 sent = conn.stream_send(*stream_id, &buf[..])?;
