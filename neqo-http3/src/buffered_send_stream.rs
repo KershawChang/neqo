@@ -5,7 +5,7 @@
 // except according to those terms.
 
 use crate::Res;
-use neqo_common::qtrace;
+use neqo_common::{qtrace, qinfo};
 use neqo_transport::{Connection, StreamId};
 
 #[derive(Debug, PartialEq, Eq)]
@@ -61,9 +61,11 @@ impl BufferedStream {
         let label = ::neqo_common::log_subject!(::log::Level::Debug, self);
         let mut sent = 0;
         if let Self::Initialized { stream_id, buf } = self {
+            qinfo!("send_buffer id={}", stream_id);
             if !buf.is_empty() {
                 qtrace!([label], "sending data.");
                 sent = conn.stream_send(*stream_id, &buf[..])?;
+                qinfo!("send_buffer ok id={}", stream_id);
                 if sent == buf.len() {
                     buf.clear();
                 } else {
