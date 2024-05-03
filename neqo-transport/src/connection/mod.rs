@@ -890,6 +890,7 @@ impl Connection {
             #[cfg(not(debug_assertions))]
             let msg = "";
             let error = ConnectionError::Transport(v.clone());
+            qdebug!([self], "Error is {:?}", error);
             match &self.state {
                 State::Closing { error: err, .. }
                 | State::Draining { error: err, .. }
@@ -1509,7 +1510,7 @@ impl Connection {
                 PreprocessResult::End => return Ok(()),
             }
 
-            qtrace!([self], "Received unverified packet {:?}", packet);
+            qdebug!([self], "Received unverified packet {:?}", packet);
 
             match packet.decrypt(&mut self.crypto.states, now + pto) {
                 Ok(payload) => {
@@ -1544,6 +1545,7 @@ impl Connection {
                         match self.process_packet(path, &payload, now) {
                             Ok(migrate) => self.postprocess_packet(path, d, &packet, migrate, now),
                             Err(e) => {
+                                eprintln!("e={:?}", e);
                                 self.ensure_error_path(path, &packet, now);
                                 return Err(e);
                             }
@@ -2900,7 +2902,9 @@ impl Connection {
                 match token {
                     RecoveryToken::Ack(_) => {}
                     RecoveryToken::Crypto(ct) => self.crypto.lost(ct),
-                    RecoveryToken::HandshakeDone => self.state_signaling.handshake_done(),
+                    RecoveryToken::HandshakeDone => {
+                        self.state_signaling.handshake_done();
+                    },
                     RecoveryToken::NewToken(seqno) => self.new_token.lost(*seqno),
                     RecoveryToken::NewConnectionId(ncid) => self.cid_manager.lost(ncid),
                     RecoveryToken::RetireConnectionId(seqno) => self.paths.lost_retire_cid(*seqno),

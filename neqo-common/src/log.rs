@@ -18,7 +18,7 @@ use env_logger::Builder;
 macro_rules! do_log {
     (target: $target:expr, $lvl:expr, $($arg:tt)+) => ({
         let lvl = $lvl;
-        if lvl <= ::log::STATIC_MAX_LEVEL && lvl <= ::log::max_level() {
+        if lvl <= ::log::max_level() {
             ::log::logger().log(
                 &::log::Record::builder()
                     .args(format_args!($($arg)+))
@@ -52,10 +52,6 @@ fn since_start() -> Duration {
 
 pub fn init(level_filter: Option<log::LevelFilter>) {
     static INIT_ONCE: Once = Once::new();
-
-    if ::log::STATIC_MAX_LEVEL == ::log::LevelFilter::Off {
-        return;
-    }
 
     INIT_ONCE.call_once(|| {
         let mut builder = Builder::from_env("RUST_LOG");

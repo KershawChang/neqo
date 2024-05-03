@@ -12,7 +12,7 @@ use std::{
     time::Instant,
 };
 
-use neqo_common::{hex, hex_with_len, qtrace, qwarn, Decoder, Encoder};
+use neqo_common::{hex, hex_with_len, qdebug, qtrace, qwarn, Decoder, Encoder};
 use neqo_crypto::random;
 
 use crate::{
@@ -774,6 +774,7 @@ impl<'a> PublicPacket<'a> {
             qtrace!("unmask hdr={}", hex(&self.data[..sample_offset]));
             crypto.compute_mask(sample)
         } else {
+            qdebug!("Got NoMoreData");
             Err(Error::NoMoreData)
         }?;
 

@@ -59,7 +59,31 @@ pub fn complete_connection(
 fn single_client() {
     let mut server = default_server();
     let mut client = default_client();
-    connect(&mut client, &mut server);
+
+    server.set_validation(ValidateAddress::Never);
+
+    assert_eq!(*client.state(), State::Init);
+    let out = client.process(None, now()); // ClientHello
+    assert!(out.as_dgram_ref().is_some());
+    let out = server.process(out.as_dgram_ref(), now()); // ServerHello...
+    assert!(out.as_dgram_ref().is_some());
+
+    // Ingest the server Certificate.
+    let out = client.process(out.as_dgram_ref(), now());
+    assert!(out.as_dgram_ref().is_some()); // This should just be an ACK.
+    let out = server.process(out.as_dgram_ref(), now());
+    assert!(out.as_dgram_ref().is_none()); // So the server should have nothing to say.
+
+    // Now mark the server as authenticated.
+    client.authenticated(AuthenticationStatus::Ok, now());
+    let out = client.process(None, now());
+    assert!(out.as_dgram_ref().is_some());
+    assert_eq!(*client.state(), State::Connected);
+    let out = server.process(out.as_dgram_ref(), now());
+    assert!(out.as_dgram_ref().is_some()); // ACK + HANDSHAKE_DONE + NST
+
+    server.process(None, now() + Duration::from_millis(10000));
+
 }
 
 #[test]
