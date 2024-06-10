@@ -240,6 +240,8 @@ impl ServerRunner {
                     break;
                 }
                 Output::None => {
+                    const INTERVAL_FOR_NONE: Duration = Duration::from_millis(500);
+                    self.timeout = Some(Box::pin(tokio::time::sleep(INTERVAL_FOR_NONE)));
                     break;
                 }
             }
