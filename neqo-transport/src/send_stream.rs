@@ -34,7 +34,7 @@ use crate::{
     AppError, Error, Res,
 };
 
-pub const SEND_BUFFER_SIZE: usize = 0x10_0000; // 1 MiB
+pub const SEND_BUFFER_SIZE: usize = 0x100_0000; // 10 MiB
 
 /// The priority that is assigned to sending data for the stream.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

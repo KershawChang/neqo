@@ -30,7 +30,7 @@ use crate::{
     AppError, Error, Res,
 };
 
-const RX_STREAM_DATA_WINDOW: u64 = 0x10_0000; // 1MiB
+const RX_STREAM_DATA_WINDOW: u64 = 0x100_0000; // 1MiB
 
 // Export as usize for consistency with SEND_BUFFER_SIZE
 #[allow(clippy::cast_possible_truncation)] // Yeah, nope.
